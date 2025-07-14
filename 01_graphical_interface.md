@@ -46,6 +46,7 @@ You can launch plasma manually by executing:
 If you plan on omitting the next step, make a script out of it and make it executable:
 
     vim ~/start_plasma.sh
+        #!/bin/bash
         /usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland
     
     chmod +x ~/start_plasma.sh
@@ -64,7 +65,7 @@ Preffered login manager for plasma is the SDDM, install it and enable:
 
 ## Final stretch
 
-Plasma has very little typical packages preinstalled. By that I mean webbrowser, terminal emulator or file browser. You can install them via CLI but Plasma provides a flatpack interface that can install pretty much anything you might think of.
+Plasma has very little typical packages preinstalled. By that I mean things like webbrowser, terminal emulator or file browser. You can install them via CLI but Plasma provides a flatpack interface that can install pretty much anything you might think of.
 
 I'd suggest you install:
 
