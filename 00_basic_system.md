@@ -5,7 +5,7 @@ This section of the guide will tell you how to install basic Arch Linux system u
 __Some of my assumptions and notes__
 
 - Here I'm absolutely NOT focusing on things like UKI, SecureBoot or encryption. Threre already exists separate tutorial/repository on that.
-- I kinda wanted BTRFS and snapshots to work but I found it to difficult to configure for run of the mill gamer system. So they won't be covered here.
+- I kinda wanted BTRFS and snapshots too work but I found it to difficult to configure for run of the mill gamer system. So they won't be covered here.
 
 ## Preparing USB and booting the installer
 
@@ -122,7 +122,7 @@ Add your user to sudo:
 
  Enable some basic systemd units:
 
- 	systemctl enable NetworkManager # Capital letters  is important !!!!!!
+ 	systemctl enable NetworkManager # Capital letters are important !!!!!!
     systemctl enable fstrim.timer
 
 Install GRUB on your drive
