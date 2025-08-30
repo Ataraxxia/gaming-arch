@@ -4,8 +4,8 @@ This section of the guide will tell you how to install basic Arch Linux system u
 
 __Some of my assumptions and notes__
 
-- Here I'm absolutely NOT focusing on things like UKI, SecureBoot or encryption. Threre already exists separate tutorial/repository on that.
-- I kinda wanted BTRFS and snapshots too work but I found it to difficult to configure for run of the mill gamer system. So they won't be covered here.
+- This setup was meant to _just work_
+- It is supposed to be easy and streamlined
 
 ## Preparing USB and booting the installer
 
@@ -47,7 +47,7 @@ The lack of SWAP partition is intentional; if you need it, you can configure SWA
 We  need to format our partitions:
 
 	mkfs.fat -F32 /dev/nvme0n1p1
-    mkfs.btrfs /dev/nvme0n1p2
+    mkfs.ext4 /dev/nvme0n1p2
 
 After all is done we need to mount our drives:
 
@@ -57,16 +57,11 @@ After all is done we need to mount our drives:
 
 ## System bootstraping
 
-It seems pacman may require PGP shenaningans, so first of all I had to execute:
-
-    pacman-key --init
-	pacman-key --populate
-
 _In the next step it is recommended to install CPU microcode package. Depending on whether you have intel of amd you should apend `intel-ucode` or `amd-ucode` to your pacstrap_
 
 My pacstrap presents as follows:
 
-	pacstrap /mnt base linux linux-firmware linux-headers btrfs-progs grub YOUR_UCODE_PACKAGE sudo vim mkinitcpio git efibootmgr networkmanager
+	pacstrap /mnt base linux linux-firmware linux-headers YOUR_UCODE_PACKAGE sudo vim mkinitcpio git efibootmgr networkmanager
 
 Generate fstab:
 
@@ -83,30 +78,6 @@ Set the root password:
 My suggestion is to also install `man` and `htop` for additional help you may require:
 
 	pacman -Syu man-db htop
-
-Set timezone and generate /etc/adjtime:
-
-	ln -sf /usr/share/zoneinfo/<Region>/<city> /etc/localtime
-	hwclock --systohc
-
-Set your desired locale:
-
-	vim /etc/locale.gen # uncomment locales you want
-	locale-gen
-
-	vim /etc/locale.conf
-		LANG=en_GB.UTF-8
-
-Configure your keyboard layout (mine is adapted to polish-programmer keyboard):
-
-	vim /etc/vconsole.conf
-		KEYMAP=pl
-		FONT=Lat2-Terminus16
-		FONT_MAP=8859-2
-
-Set your hostname:
-
-	vim /etc/hostname
 
 Create your user:
 
@@ -125,17 +96,31 @@ Add your user to sudo:
  	systemctl enable NetworkManager # Capital letters are important !!!!!!
     systemctl enable fstrim.timer
 
-Install GRUB on your drive
+Install systemd-boot
 
-    grub-install /dev/nvme0n1
+    bootctl install
 
-You should have files like `vmlinuz` or `initramfs` in your `/boot`, if not, reinstall `linux` package so it regenerates your kernel:
+Switch mkinitcpio to generate Unified Kernel Image. You'll need to comment/uncomment some lines and fix paths to match EFI partition mountpoint
 
-    pacman -S linux
+	vim /etc/mkinitcpio.d/linux.preset
+ 		#default_image=(...)  # COMMENT OUT THIS LINE
+   		default_uki="/boot/efi/EFI/Linux/arch-linux.efi"	 # UNCOMMENT THIS LINE AND FIX PATH
+	 
+  		#fallback_image=(...) # COMMENT OUT THIS LINE
+		fallback_uki="/boot/efi/EFI/Linux/arch-linux-fallback.efi"	 # UNCOMMENT THIS LINE AND FIX PATH
 
-Generate grub config, it will detect files in your `/boot`:
+Prepare kernel commandline:
 
-    grub-mkconfig > /boot/grub/grub.cfg
+	U=`blkid -s UUID -o value /dev/nvme0n1p2`
+ 	echo "root=UUID=$U rw quiet splash" > /etc/kernel/cmdline
+
+Regenerate linux image:
+
+	pacman -S linux
+ 		
+Create boot entry:
+
+	efibootmgr --create --disk /dev/nvme0n1 --part 1 --label "Gaming Arch Linux" --loader 'EFI\BOOT\BOOTX64.efi' --unicode
 
 Reboot and you should be able to boot into your system! It's only CLI at this point so make sure you check out the next part of this tutorial.
 
