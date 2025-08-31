@@ -52,7 +52,7 @@ We  need to format our partitions:
 After all is done we need to mount our drives:
 
 	mount /dev/nvme0n1p2 /mnt
-	mkdir -p /mnt/boot/efi
+	mkdir -p /mnt/efi
 	mount /dev/nvme0n1p1 /mnt/boot/efi
 
 ## System bootstraping
@@ -104,10 +104,10 @@ Switch mkinitcpio to generate Unified Kernel Image. You'll need to comment/uncom
 
 	vim /etc/mkinitcpio.d/linux.preset
  		#default_image=(...)  # COMMENT OUT THIS LINE
-   		default_uki="/boot/efi/EFI/Linux/arch-linux.efi"	 # UNCOMMENT THIS LINE AND FIX PATH
+   		default_uki=(...) # UNCOMMENT THIS LINE
 	 
   		#fallback_image=(...) # COMMENT OUT THIS LINE
-		fallback_uki="/boot/efi/EFI/Linux/arch-linux-fallback.efi"	 # UNCOMMENT THIS LINE AND FIX PATH
+		fallback_uki=(...)  # UNCOMMENT THIS LINE 
 
 Prepare kernel commandline:
 
